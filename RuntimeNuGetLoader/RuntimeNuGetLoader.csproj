@@ -1,15 +1,41 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net7.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
+        <OutputType>Library</OutputType>
+        <TargetFrameworks>net7.0;netstandard2.0;net472</TargetFrameworks>
+        <Description>A library that can load nuget packages at runtime. It can resolve dependencies locally and with nuget.org.</Description>
+        <PackageProjectUrl>https://github.com/Teddy55Codes/RuntimeNuGetLoader</PackageProjectUrl>
+        <PackageLicenseUrl>https://licenses.nuget.org/MIT</PackageLicenseUrl>
+        <RepositoryUrl>https://github.com/Teddy55Codes/RuntimeNuGetLoader</RepositoryUrl>
     </PropertyGroup>
 
-    <ItemGroup>
+    <PropertyGroup Condition="'$(TargetFramework)' == 'net7.0'">
+        <LangVersion>11.0</LangVersion>
+        <Nullable>enable</Nullable>
+        <DefineConstants>LANG_V11</DefineConstants>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard2.0' Or '$(TargetFramework)' == 'net472'">
+        <LangVersion>7.3</LangVersion>
+    </PropertyGroup>
+    
+    <ItemGroup Condition="'$(TargetFramework)' == 'net7.0'">
       <PackageReference Include="NuGet.Frameworks" Version="6.5.0" />
       <PackageReference Include="NuGet.Packaging" Version="6.5.0" />
       <PackageReference Include="Spectre.Console" Version="0.46.0" />
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+        <PackageReference Include="NuGet.Frameworks" Version="6.5.0" />
+        <PackageReference Include="NuGet.Packaging" Version="6.5.0" />
+        <PackageReference Include="Spectre.Console" Version="0.46.0" />
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(TargetFramework)' == 'net472'">
+        <PackageReference Include="NuGet.Frameworks" Version="6.5.0" />
+        <PackageReference Include="NuGet.Packaging" Version="6.5.0" />
+        <PackageReference Include="System.Net.Http" Version="4.3.4" />
+        <PackageReference Include="Spectre.Console" Version="0.46.0" />
     </ItemGroup>
 
 </Project>
