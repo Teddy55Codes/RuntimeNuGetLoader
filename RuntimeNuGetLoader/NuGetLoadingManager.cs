@@ -112,7 +112,7 @@ namespace RuntimeNuGetLoader
 #if  NETFRAMEWORK || NET
             var targetFramework = NuGetFramework.Parse(AppDomain.CurrentDomain.SetupInformation.TargetFrameworkName ?? "netstandard2.0");
 #elif NETSTANDARD
-            var targetFramework = NuGetFramework.Parse(RuntimeInformation.FrameworkDescription ?? "netstandard2.0");
+            var targetFramework = NuGetFramework.Parse(AppContext.TargetFrameworkName ?? "netstandard2.0");
 #endif
 #if WINDOWS
             // add windows platform to differentiate between for example net7.0 and net7.0-windows7.0
