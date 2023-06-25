@@ -21,7 +21,7 @@ namespace RuntimeNuGetLoader
         /// <summary>
         /// Weather or not the <see cref="Assembly"/> was added by the <see cref="NuGetLoadingManager"/>.
         /// </summary>
-        public bool IsManagedByNuGetManager;
+        internal bool IsManagedByNuGetManager;
         
         /// <summary>
         /// A <see cref="List{T}"/> of <see cref="Assembly"/> from this packages.

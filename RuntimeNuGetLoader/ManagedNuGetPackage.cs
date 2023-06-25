@@ -61,7 +61,7 @@ namespace RuntimeNuGetLoader
         /// <param name="manager">instance of its <see cref="NuGetLoadingManager"/></param>
         /// <exception cref="Exception">Thrown if the .nuspec file has an invalid format.</exception>
         /// <exception cref="ArgumentException">Thrown if the package version in the .nuspec is invalid (to a valid <see cref="NuGetVersion"/>)</exception>
-        public ManagedNuGetPackage(string nuGetPackagePath, NuGetLoadingManager manager)
+        internal ManagedNuGetPackage(string nuGetPackagePath, NuGetLoadingManager manager)
         {
             _nuGetPackagePath = nuGetPackagePath;
             _managerParent = manager;
@@ -109,9 +109,9 @@ namespace RuntimeNuGetLoader
         /// <returns>The <see cref="AssemblyTree"/> for the loaded NuGet package.</returns>
         /// <exception cref="Exception">A multitude of Exceptions that can arise during resolution and loading of NuGet packages. (currently no custom exceptions have been created)</exception>
 #if LANG_V11  
-        public AssemblyTree GetAssemblies(NuGetFramework currentTF, bool downloadMissing, string? dependencyFolderPath = null)
+        internal AssemblyTree GetAssemblies(NuGetFramework currentTF, bool downloadMissing, string? dependencyFolderPath = null)
 #else
-        public AssemblyTree GetAssemblies(NuGetFramework currentTF, bool downloadMissing, string dependencyFolderPath = null)
+        internal AssemblyTree GetAssemblies(NuGetFramework currentTF, bool downloadMissing, string dependencyFolderPath = null)
 #endif
         {
             if (downloadMissing && dependencyFolderPath == null) throw new ArgumentNullException(dependencyFolderPath, $"A path for storing dependencies must be set. If {nameof(downloadMissing)} is set to true {nameof(dependencyFolderPath)} can't be null.");
