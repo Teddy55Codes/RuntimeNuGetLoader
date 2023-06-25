@@ -3,10 +3,15 @@
     <PropertyGroup>
         <OutputType>Library</OutputType>
         <TargetFrameworks>net7.0;netstandard2.0;net472</TargetFrameworks>
-        <Description>A library that can load nuget packages at runtime. It can resolve dependencies locally and with nuget.org.</Description>
+        <Description>A library that can load nuget packages at runtime from loacal files and optionally also from nuget.org. This includes all dependencies for these packages.</Description>
         <PackageProjectUrl>https://github.com/Teddy55Codes/RuntimeNuGetLoader</PackageProjectUrl>
         <PackageLicenseUrl>https://licenses.nuget.org/MIT</PackageLicenseUrl>
         <RepositoryUrl>https://github.com/Teddy55Codes/RuntimeNuGetLoader</RepositoryUrl>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Version>0.1.0</Version>
+        <Title>RuntimeNuGetLoader</Title>
+        <Copyright>MIT</Copyright>
+        <PackageTags>dependencyinjection nuget packagemanager</PackageTags>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(TargetFramework)' == 'net7.0'">
