@@ -2,8 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
+using System.Net.Http;
 using NuGet.Frameworks;
+using NuGet.Versioning;
 
 namespace RuntimeNuGetLoader
 {
@@ -47,12 +48,24 @@ namespace RuntimeNuGetLoader
         /// Get a Nuget package from AvailableNuGets with a given id.
         /// </summary>
         /// <param name="id">the NuGet package Id <a href="https://learn.microsoft.com/en-us/nuget/reference/nuspec#id">Id in nuspec (microsoft docs)</a> </param>
+        /// <param name="nuGetVersion">Specifies the version of the nuget to load. When loading locally this is optional but if you want to download the nuget this is required</param>
+        /// <param name="savePath">The place where the nuget package should be downloaded to. (only applies if the nuget was not found locally)</param>
         /// <returns>instance of <see cref="ManagedNuGetPackage"/> or null if package was not found.</returns>
 #if LANG_V11
-        public ManagedNuGetPackage? GetPackageById(string id) => AvailableNuGets.FirstOrDefault(npkgi => npkgi.Id == id);
+        public ManagedNuGetPackage? GetPackageById(string id, NuGetVersion? nuGetVersion = null, string? savePath = null)
 #else
-        public ManagedNuGetPackage GetPackageById(string id) => AvailableNuGets.FirstOrDefault(npkgi => npkgi.Id == id);
+        public ManagedNuGetPackage GetPackageById(string id, NuGetVersion nuGetVersion = null, string savePath = null)
 #endif
+        {
+            // first check if nuget already exists
+            var existingNuget = AvailableNuGets.FirstOrDefault(npkgi => npkgi.Id == id && (nuGetVersion == null || npkgi.Version == nuGetVersion));
+            if (existingNuget != null) return existingNuget;
+            
+            // if nuget was not found locally and downloading parameters where supplied nuget is downloaded
+            if (nuGetVersion == null || savePath == null) return null;
+            AddNugetFromFile(DownloadNugetPackage(id, nuGetVersion, savePath));   
+            return AvailableNuGets.FirstOrDefault(npkgi => npkgi.Id == id && npkgi.Version == nuGetVersion);
+        }
 
         /// <summary>
         /// Does the same thing as <see cref="RequestPackage"/> but for a <see cref="List{T}"/> of <see cref="ManagedNuGetPackage"/>.
@@ -101,12 +114,42 @@ namespace RuntimeNuGetLoader
             AssemblyTree.DependencyAssemblies.Add(asmTree);
             return asmTree;
         }
+        
+        /// <summary>
+        /// Downloads a nuget package from <a href="https://www.nuget.org">nuget.org</a>.
+        /// </summary>
+        /// <param name="packageID">The <a href="https://learn.microsoft.com/en-us/nuget/reference/nuspec#id">Id</a> of the package to download.</param>
+        /// <param name="packageVersion">The <a href="https://learn.microsoft.com/en-us/nuget/reference/nuspec#version">version</a> of the package to download.</param>
+        /// <param name="savePath">The path where the nuget should be saved at.</param>
+        /// <returns>The path that the nuget has been saved to.</returns>
+        /// <exception cref="Exception">The download has failed for whatever reason.</exception>
+        internal string DownloadNugetPackage(string packageID, NuGetVersion packageVersion, string savePath)
+        {
+            // official NuGet repository url
+            var url = $"https://www.nuget.org/api/v2/package/{packageID}/{packageVersion}";
+            try
+            {
+                HttpResponseMessage response = new HttpClient().GetAsync(url).Result;
+                response.EnsureSuccessStatusCode();
+                byte[] responseBody = response.Content.ReadAsByteArrayAsync().Result;
+
+                // Write the package to disk
+                string fileName = $"{packageID}.{packageVersion}.nupkg";
+                var filePath = Path.Combine(savePath, fileName);
+                File.WriteAllBytes(filePath, responseBody);
+                return filePath;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Could not download package {packageID}.{packageVersion}", ex);
+            }
+        }
 
         /// <summary>
         /// Translates the <see cref="AppDomainSetup.TargetFrameworkName"/> of the current <see cref="AppDomain"/> to a <see cref="NuGetFramework"/>
         /// </summary>
         /// <returns>instance of <see cref="NuGetFramework"/></returns>
-        public static NuGetFramework GetRunningFramework()
+        internal static NuGetFramework GetRunningFramework()
         {
             
 #if  NETFRAMEWORK || NET

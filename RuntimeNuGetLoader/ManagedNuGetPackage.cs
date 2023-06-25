@@ -4,7 +4,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Net.Http;
 using System.Reflection;
 using System.Xml.Linq;
 using NuGet.Frameworks;
@@ -143,7 +142,13 @@ namespace RuntimeNuGetLoader
 #endif
                     {
                         assemblyTree.DependencyAssemblies.Add(
-                            new AssemblyTree { PackageId = alreadyLoadedAssembly.GetName().Name, PackageVersion = alreadyLoadedAssembly.GetName().Version.ToString(), IsManagedByNuGetManager = false, OwnAssemblies = new List<Assembly> { alreadyLoadedAssembly } });
+                            new AssemblyTree
+                            {
+                                PackageId = alreadyLoadedAssembly.GetName().Name, 
+                                PackageVersion = alreadyLoadedAssembly.GetName().Version.ToString(), 
+                                IsManagedByNuGetManager = false, 
+                                OwnAssemblies = new List<Assembly> { alreadyLoadedAssembly }
+                            });
                         continue;
                     }
                     if (!downloadMissing)
@@ -158,7 +163,11 @@ namespace RuntimeNuGetLoader
                     // if downloading is enabled try get the NuGet package from nuget.org
                     if (downloadMissing)
                     {
-                        var nugetFilePath = DownloadNugetPackage(dependency.Id, dependency.VersionRange.HasUpperBound ? dependency.VersionRange.MaxVersion : dependency.VersionRange.MinVersion);
+                        var nugetFilePath = _managerParent.DownloadNugetPackage(
+                            dependency.Id, 
+                            dependency.VersionRange.HasUpperBound ? dependency.VersionRange.MaxVersion : dependency.VersionRange.MinVersion,
+                            _dependencyPackagePath);
+                        
                         _managerParent.AddNugetFromFile(nugetFilePath);
                         // now that this package is available we retry the loading process.
                         i--;
@@ -263,28 +272,6 @@ namespace RuntimeNuGetLoader
             return sortedDependencies;
         }
 
-        private string DownloadNugetPackage(string packageID, NuGetVersion packageVersion)
-        {
-            // official NuGet repository url
-            var url = $"https://www.nuget.org/api/v2/package/{packageID}/{packageVersion}";
-            try
-            {
-                HttpResponseMessage response = new HttpClient().GetAsync(url).Result;
-                response.EnsureSuccessStatusCode();
-                byte[] responseBody = response.Content.ReadAsByteArrayAsync().Result;
-
-                // Write the package to disk
-                string fileName = $"{packageID}.{packageVersion}.nupkg";
-                var filePath = Path.Combine(_dependencyPackagePath, fileName);
-                File.WriteAllBytes(filePath, responseBody);
-                return filePath;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Could not download package {packageID}.{packageVersion}", ex);
-            }
-        }
-        
 #if LANG_V11
         private static bool IsAssemblyLoaded(string assemblyName, VersionRange versionRange, [NotNullWhen(true)] out Assembly? bestMatch)
 #else
