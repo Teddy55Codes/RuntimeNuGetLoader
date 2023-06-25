@@ -13,10 +13,6 @@ using NuGet.Versioning;
 
 namespace RuntimeNuGetLoader
 {
-    // TODO: for packages that have a single version for a dependency this represents the min version.
-    // TODO: Currently that one is just picked but it would make more sense to allow using all greater versions with the same major version.
-    // TODO: This would allow to switch to a more stable "Unification" model instead of doing "Side by Side" which can cause issues.
-    // TODO: Make to modes "Unification" as default.
     public class ManagedNuGetPackage
     {
         /// <summary>
