@@ -65,7 +65,7 @@ namespace RuntimeNuGetLoader
         {
             _nuGetPackagePath = nuGetPackagePath;
             _managerParent = manager;
-#if LANG_V11
+#if LANG_V12
             using ZipArchive archive = ZipFile.OpenRead(_nuGetPackagePath);
 #else
             ZipArchive archive = ZipFile.OpenRead(_nuGetPackagePath);
@@ -88,7 +88,7 @@ namespace RuntimeNuGetLoader
             {
                 throw new ArgumentException($"Found invalid version format in package {Id} ({_nuGetPackagePath})", ex);
             }
-#if LANG_V11
+#if LANG_V12
             using var packageArchiveReader = new PackageArchiveReader(_nuGetPackagePath);
 #else
             var packageArchiveReader = new PackageArchiveReader(_nuGetPackagePath);
@@ -108,7 +108,7 @@ namespace RuntimeNuGetLoader
         /// <param name="downloadMissing">Weather or not to download missing dependencies from <a href="https://www.nuget.org">nuget.org</a>.</param>
         /// <returns>The <see cref="AssemblyTree"/> for the loaded NuGet package.</returns>
         /// <exception cref="Exception">A multitude of Exceptions that can arise during resolution and loading of NuGet packages. (currently no custom exceptions have been created)</exception>
-#if LANG_V11  
+#if LANG_V12  
         internal AssemblyTree GetAssemblies(NuGetFramework currentTF, bool downloadMissing, string? dependencyFolderPath = null)
 #else
         internal AssemblyTree GetAssemblies(NuGetFramework currentTF, bool downloadMissing, string dependencyFolderPath = null)
@@ -135,7 +135,7 @@ namespace RuntimeNuGetLoader
                 if (!dependencyCandidates.Any())
                 {
                     // check if it is already loaded
-#if LANG_V11
+#if LANG_V12
                     if (IsAssemblyLoaded(dependency.Id, dependency.VersionRange, out Assembly? alreadyLoadedAssembly))
 #else
                     if (IsAssemblyLoaded(dependency.Id, dependency.VersionRange, out Assembly alreadyLoadedAssembly))
@@ -184,7 +184,7 @@ namespace RuntimeNuGetLoader
                 if (!bestMatchDependency._dependencies.Any() && bestMatchDependency._isLinkingNuGet) continue;
 
                 // if assembly is already loaded just add its tree without re-getting the assemblies
-#if LANG_V11
+#if LANG_V12
                 if (IsAssemblyLoaded(dependency.Id, new VersionRange(bestMatchVersion), out Assembly? dependencyAssembly))
 #else
                 if (IsAssemblyLoaded(dependency.Id, new VersionRange(bestMatchVersion), out Assembly dependencyAssembly))
@@ -201,7 +201,7 @@ namespace RuntimeNuGetLoader
             if (mostCompatible.Item2 != null)
             {
                 var mostCompatibleGroup = mostCompatible.Item2;
-#if LANG_V11
+#if LANG_V12
                 using var packageArchiveReader = new PackageArchiveReader(_nuGetPackagePath);
 #else
                 var packageArchiveReader = new PackageArchiveReader(_nuGetPackagePath);
@@ -209,7 +209,7 @@ namespace RuntimeNuGetLoader
                 foreach (var item in mostCompatibleGroup.Items.Where(item => item.EndsWith(".dll")))
                 {
                     var entry = packageArchiveReader.GetEntry(item);
-#if LANG_V11
+#if LANG_V12
                     using var target = new MemoryStream();
                     using var source = entry.Open();
 #else
@@ -232,7 +232,7 @@ namespace RuntimeNuGetLoader
         /// <param name="target">The <see cref="NuGetFramework"/> to consider.</param>
         /// <returns>The most compatible <see cref="NuGetFramework"/> value 1 is from .nuspec and value 2 is from lib folder.</returns>
         /// <exception cref="Exception">Throws if no compatible <see cref="NuGetFramework"/> was found.</exception>
-#if LANG_V11
+#if LANG_V12
         private (NuGetFramework, FrameworkSpecificGroup?) GetMostCompatibleFramework(NuGetFramework target)
 #else
         private (NuGetFramework, FrameworkSpecificGroup) GetMostCompatibleFramework(NuGetFramework target)
@@ -244,7 +244,7 @@ namespace RuntimeNuGetLoader
             return compatibleFrameworks.First();
         }
         
-#if LANG_V11
+#if LANG_V12
         private List<(NuGetFramework, FrameworkSpecificGroup?)> GetCompatibleFrameworksDec(NuGetFramework target)
 #else
         private List<(NuGetFramework, FrameworkSpecificGroup)> GetCompatibleFrameworksDec(NuGetFramework target)
@@ -254,7 +254,7 @@ namespace RuntimeNuGetLoader
             // get compatible dependencies (from .nuspec)
             var compatibleDependencies = _dependencies.Select(dep => dep.TargetFramework)
                 .Where(targetFramework => compatibilityProvider.IsCompatible(target, targetFramework)).ToList();
-#if LANG_V11
+#if LANG_V12
             var sortedDependencies = new List<(NuGetFramework, FrameworkSpecificGroup?)>();
 #else
             var sortedDependencies = new List<(NuGetFramework, FrameworkSpecificGroup)>();
@@ -272,7 +272,7 @@ namespace RuntimeNuGetLoader
             return sortedDependencies;
         }
 
-#if LANG_V11
+#if LANG_V12
         private static bool IsAssemblyLoaded(string assemblyName, VersionRange versionRange, [NotNullWhen(true)] out Assembly? bestMatch)
 #else
         private static bool IsAssemblyLoaded(string assemblyName, VersionRange versionRange, out Assembly bestMatch)

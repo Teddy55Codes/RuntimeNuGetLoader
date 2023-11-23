@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Reflection;
-#if NETSTANDARD2_0 || NET7_0
+#if NETSTANDARD2_0 || NET8_0
 using Spectre.Console;
 #endif
 
@@ -33,7 +33,7 @@ namespace RuntimeNuGetLoader
         /// </summary>
         public List<AssemblyTree> DependencyAssemblies = new List<AssemblyTree>();
 
-#if NETSTANDARD2_0 || NET7_0
+#if NETSTANDARD2_0 || NET8_0
         /// <summary>
         /// Generates a <see cref="Tree"/> that represents the dependencies of this package.
         /// </summary>

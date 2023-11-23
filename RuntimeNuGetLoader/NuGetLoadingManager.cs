@@ -15,15 +15,15 @@ namespace RuntimeNuGetLoader
         /// </summary>
         public AssemblyTree AssemblyTree = new AssemblyTree();
 
-#if NET7_0
-        public static NuGetLoadingManager Instance => _nuGetLoadingManager ??= new NuGetLoadingManager();
-#else
-        public static NuGetLoadingManager Instance => _nuGetLoadingManager ?? (_nuGetLoadingManager = new NuGetLoadingManager());
-#endif
         internal List<ManagedNuGetPackage> AvailableNuGets = new List<ManagedNuGetPackage>();
-#if LANG_V11
+        
+#if LANG_V12
+        public static NuGetLoadingManager Instance => _nuGetLoadingManager ??= new NuGetLoadingManager();
+        
         private static NuGetLoadingManager? _nuGetLoadingManager;
 #else
+        public static NuGetLoadingManager Instance => _nuGetLoadingManager ?? (_nuGetLoadingManager = new NuGetLoadingManager());
+
         private static NuGetLoadingManager _nuGetLoadingManager;
 #endif
 
@@ -51,7 +51,7 @@ namespace RuntimeNuGetLoader
         /// <param name="nuGetVersion">Specifies the version of the nuget to load. When loading locally this is optional but if you want to download the nuget this is required</param>
         /// <param name="savePath">The place where the nuget package should be downloaded to. (only applies if the nuget was not found locally)</param>
         /// <returns>instance of <see cref="ManagedNuGetPackage"/> or null if package was not found.</returns>
-#if LANG_V11
+#if LANG_V12
         public ManagedNuGetPackage? GetPackageById(string id, NuGetVersion? nuGetVersion = null, string? savePath = null)
 #else
         public ManagedNuGetPackage GetPackageById(string id, NuGetVersion nuGetVersion = null, string savePath = null)
@@ -75,7 +75,7 @@ namespace RuntimeNuGetLoader
         /// <param name="downloadMissing">Weather or not to download missing dependencies from <a href="https://www.nuget.org">nuget.org</a></param>
         /// <returns>Instance of <see cref="AssemblyTree"/> containing an <see cref="AssemblyTree"/> in its <see cref="AssemblyTree.DependencyAssemblies"/> for each requested package.</returns>
         /// <exception cref="Exception">A multitude of Exceptions that can arise during resolution and loading of NuGet packages. (currently no custom exceptions have been created)</exception>
-#if LANG_V11
+#if LANG_V12
         public AssemblyTree RequestPackages(IEnumerable<ManagedNuGetPackage> requestedPackages, bool downloadMissing, string?  dependenciesFolderPath = null)
 #else
         public AssemblyTree RequestPackages(IEnumerable<ManagedNuGetPackage> requestedPackages, bool downloadMissing, string  dependenciesFolderPath = null)
@@ -102,7 +102,7 @@ namespace RuntimeNuGetLoader
         /// <param name="downloadMissing">Weather or not to download missing dependencies from <a href="https://www.nuget.org">nuget.org</a></param>
         /// <returns>Instance of <see cref="AssemblyTree"/> for the requested package</returns>
         /// <exception cref="Exception">A multitude of Exceptions that can arise during resolution and loading of NuGet packages. (currently no custom exceptions have been created)</exception>
-#if LANG_V11
+#if LANG_V12
         public AssemblyTree RequestPackage(ManagedNuGetPackage requestedPackage, bool downloadMissing, string? dependenciesFolderPath = null)
 #else
         public AssemblyTree RequestPackage(ManagedNuGetPackage requestedPackage, bool downloadMissing, string dependenciesFolderPath = null)
@@ -158,7 +158,7 @@ namespace RuntimeNuGetLoader
             var targetFramework = NuGetFramework.Parse(AppContext.TargetFrameworkName ?? "netstandard2.0");
 #endif
 #if WINDOWS
-            // add windows platform to differentiate between for example net7.0 and net7.0-windows7.0
+            // add windows platform to differentiate between for example net8.0 and net8.0-windows8.0
             targetFramework = new NuGetFramework(targetFramework.Framework, targetFramework.Version, "Windows", targetFramework.Version);
 #endif
             return targetFramework;
