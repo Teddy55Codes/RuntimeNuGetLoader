@@ -14,9 +14,9 @@ namespace RuntimeNuGetLoader
         /// <summary>
         /// An <see cref="AssemblyTree"/> which has all directly requested packages in its <see cref="AssemblyTree.DependencyAssemblies"/>
         /// </summary>
-        public AssemblyTree AssemblyTree = new AssemblyTree();
+        public AssemblyTree AssemblyTree { get; set; } = new AssemblyTree();
 
-        internal List<ManagedNuGetPackage> AvailableNuGets = new List<ManagedNuGetPackage>();
+        internal List<ManagedNuGetPackage> AvailableNuGets { get; set; } = new List<ManagedNuGetPackage>();
         
 #if LANG_V12
         public static NuGetLoadingManager Instance => _nuGetLoadingManager ??= new NuGetLoadingManager();

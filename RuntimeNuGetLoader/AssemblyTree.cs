@@ -12,27 +12,27 @@ namespace RuntimeNuGetLoader
         /// <summary>
         /// <a href="https://learn.microsoft.com/en-us/nuget/reference/nuspec#id">Microsoft docs for Id in nuspec.</a>
         /// </summary>
-        public string PackageId;
+        public string PackageId { get; set; }
 
         /// <summary>
         /// <a href="https://learn.microsoft.com/en-us/nuget/reference/nuspec#version">Microsoft docs for Version in nuspec.</a>
         /// </summary>
-        public string PackageVersion;
+        public string PackageVersion { get; set; }
 
         /// <summary>
         /// Weather or not the <see cref="Assembly"/> was added by the <see cref="NuGetLoadingManager"/>.
         /// </summary>
-        internal bool IsManagedByNuGetManager;
-        
+        internal bool IsManagedByNuGetManager { get; set; }
+
         /// <summary>
         /// A <see cref="List{T}"/> of <see cref="Assembly"/> from this packages.
         /// </summary>
-        public List<Assembly> OwnAssemblies = new List<Assembly>();
+        public List<Assembly> OwnAssemblies { get; set; } = new List<Assembly>();
 
         /// <summary>
         /// A <see cref="List{T}"/> of <see cref="AssemblyTree"/> from the direct dependencies of this package.
         /// </summary>
-        public List<AssemblyTree> DependencyAssemblies = new List<AssemblyTree>();
+        public List<AssemblyTree> DependencyAssemblies { get; set; } = new List<AssemblyTree>();
         
         /// <summary>
         /// Get all <see cref="Assembly">assemblies</see> this package and all its dependencies.
