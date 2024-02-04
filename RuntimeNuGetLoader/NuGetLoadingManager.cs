@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Reflection;
 using NuGet.Frameworks;
 using NuGet.Versioning;
 
@@ -27,8 +28,14 @@ namespace RuntimeNuGetLoader
         private static NuGetLoadingManager _nuGetLoadingManager;
 #endif
 
-        private NuGetLoadingManager() => _nuGetLoadingManager = this;
-
+        private NuGetLoadingManager()
+        {
+            AppDomain.CurrentDomain.AssemblyResolve += NuGetLoadingManagerAssemblyResolver;
+            _nuGetLoadingManager = this;
+        } 
+        
+        private Assembly NuGetLoadingManagerAssemblyResolver(object sender, ResolveEventArgs args) => AssemblyTree.GetOwnAndDependentAssemblies().FirstOrDefault(asm => asm.FullName == args.Name);
+        
         /// <summary>
         /// Adds a new <see cref="ManagedNuGetPackage"/> from a local .nupkg file to the AvailableNuGets.
         /// </summary>

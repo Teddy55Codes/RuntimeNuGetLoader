@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 #if NETSTANDARD2_0 || NET8_0
 using Spectre.Console;
@@ -32,7 +33,31 @@ namespace RuntimeNuGetLoader
         /// A <see cref="List{T}"/> of <see cref="AssemblyTree"/> from the direct dependencies of this package.
         /// </summary>
         public List<AssemblyTree> DependencyAssemblies = new List<AssemblyTree>();
+        
+        /// <summary>
+        /// Get all <see cref="Assembly">assemblies</see> this package and all its dependencies.
+        /// </summary>
+        /// <returns>A <see cref="List{T}"/> of <see cref="Assembly">assemblies</see> for this package and all its dependencies.</returns>
+        public List<Assembly> GetOwnAndDependentAssemblies()
+        {
+            return GetAllAssembliesRecursively();
+        }
 
+        private List<Assembly> GetAllAssembliesRecursively(List<Assembly> assemblies = null)
+        {
+            if (assemblies == null) assemblies = new List<Assembly>();
+            foreach (var ownAssembly in OwnAssemblies)
+            {
+                if (assemblies.All(asm => asm.FullName != ownAssembly.FullName)) assemblies.Add(ownAssembly);
+            }
+            foreach (var dependencyAssembly in DependencyAssemblies)
+            {
+                assemblies = dependencyAssembly.GetAllAssembliesRecursively(assemblies);
+            }
+
+            return assemblies;
+        }
+        
 #if NETSTANDARD2_0 || NET8_0
         /// <summary>
         /// Generates a <see cref="Tree"/> that represents the dependencies of this package.
