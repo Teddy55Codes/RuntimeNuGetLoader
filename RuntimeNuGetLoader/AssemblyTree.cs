@@ -42,8 +42,12 @@ namespace RuntimeNuGetLoader
         {
             return GetAllAssembliesRecursively();
         }
-
+        
+#if LANG_V12 
+        private List<Assembly> GetAllAssembliesRecursively(List<Assembly>? assemblies = null)
+#else
         private List<Assembly> GetAllAssembliesRecursively(List<Assembly> assemblies = null)
+#endif
         {
             if (assemblies == null) assemblies = new List<Assembly>();
             foreach (var ownAssembly in OwnAssemblies)
