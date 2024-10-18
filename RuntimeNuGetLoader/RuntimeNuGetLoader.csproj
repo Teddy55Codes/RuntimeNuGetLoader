@@ -6,7 +6,7 @@
         <Nullable>enable</Nullable>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Title>RuntimeNuGetLoader</Title>
-        <Version>0.1.0</Version>
+        <Version>0.2.0</Version>
         <Description>A library that can load nuget packages at runtime from loacal files and optionally also from nuget.org. This includes all dependencies for these packages.</Description>
         <PackageProjectUrl>https://github.com/Teddy55Codes/RuntimeNuGetLoader</PackageProjectUrl>
         <RepositoryUrl>https://github.com/Teddy55Codes/RuntimeNuGetLoader</RepositoryUrl>
