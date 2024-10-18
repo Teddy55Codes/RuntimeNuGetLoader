@@ -2,7 +2,8 @@
 
     <PropertyGroup>
         <OutputType>Library</OutputType>
-        <TargetFrameworks>net8.0;netstandard2.0;net472</TargetFrameworks>
+        <TargetFramework>net8.0</TargetFramework>
+        <Nullable>enable</Nullable>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Title>RuntimeNuGetLoader</Title>
         <Version>0.1.0</Version>
@@ -12,34 +13,10 @@
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageTags>dependencyinjection nuget packagemanager</PackageTags>
     </PropertyGroup>
-
-    <PropertyGroup Condition="'$(TargetFramework)' == 'net8.0'">
-        <LangVersion>12.0</LangVersion>
-        <Nullable>enable</Nullable>
-        <DefineConstants>LANG_V12</DefineConstants>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard2.0' Or '$(TargetFramework)' == 'net472'">
-        <LangVersion>7.3</LangVersion>
-    </PropertyGroup>
     
-    <ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
+    <ItemGroup>
       <PackageReference Include="NuGet.Frameworks" Version="6.8.0" />
       <PackageReference Include="NuGet.Packaging" Version="6.5.0" />
       <PackageReference Include="Spectre.Console" Version="0.48.0" />
     </ItemGroup>
-
-    <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-        <PackageReference Include="NuGet.Frameworks" Version="6.8.0" />
-        <PackageReference Include="NuGet.Packaging" Version="6.5.0" />
-        <PackageReference Include="Spectre.Console" Version="0.48.0" />
-    </ItemGroup>
-
-    <ItemGroup Condition="'$(TargetFramework)' == 'net472'">
-        <PackageReference Include="NuGet.Frameworks" Version="6.8.0" />
-        <PackageReference Include="NuGet.Packaging" Version="6.5.0" />
-        <PackageReference Include="System.Net.Http" Version="4.3.4" />
-        <PackageReference Include="Spectre.Console" Version="0.48.0" />
-    </ItemGroup>
-
 </Project>

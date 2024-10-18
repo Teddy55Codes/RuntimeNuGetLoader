@@ -18,15 +18,9 @@ namespace RuntimeNuGetLoader
 
         internal List<ManagedNuGetPackage> AvailableNuGets { get; set; } = new List<ManagedNuGetPackage>();
         
-#if LANG_V12
         public static NuGetLoadingManager Instance => _nuGetLoadingManager ??= new NuGetLoadingManager();
         
         private static NuGetLoadingManager? _nuGetLoadingManager;
-#else
-        public static NuGetLoadingManager Instance => _nuGetLoadingManager ?? (_nuGetLoadingManager = new NuGetLoadingManager());
-
-        private static NuGetLoadingManager _nuGetLoadingManager;
-#endif
 
         private NuGetLoadingManager()
         {
@@ -58,11 +52,7 @@ namespace RuntimeNuGetLoader
         /// <param name="nuGetVersion">Specifies the version of the nuget to load. When loading locally this is optional but if you want to download the nuget this is required</param>
         /// <param name="savePath">The place where the nuget package should be downloaded to. (only applies if the nuget was not found locally)</param>
         /// <returns>instance of <see cref="ManagedNuGetPackage"/> or null if package was not found.</returns>
-#if LANG_V12
         public ManagedNuGetPackage? GetPackageById(string id, NuGetVersion? nuGetVersion = null, string? savePath = null)
-#else
-        public ManagedNuGetPackage GetPackageById(string id, NuGetVersion nuGetVersion = null, string savePath = null)
-#endif
         {
             // first check if nuget already exists
             var existingNuget = AvailableNuGets.FirstOrDefault(npkgi => npkgi.Id == id && (nuGetVersion == null || npkgi.Version == nuGetVersion));
@@ -82,11 +72,7 @@ namespace RuntimeNuGetLoader
         /// <param name="downloadMissing">Weather or not to download missing dependencies from <a href="https://www.nuget.org">nuget.org</a></param>
         /// <returns>Instance of <see cref="AssemblyTree"/> containing an <see cref="AssemblyTree"/> in its <see cref="AssemblyTree.DependencyAssemblies"/> for each requested package.</returns>
         /// <exception cref="Exception">A multitude of Exceptions that can arise during resolution and loading of NuGet packages. (currently no custom exceptions have been created)</exception>
-#if LANG_V12
         public AssemblyTree RequestPackages(IEnumerable<ManagedNuGetPackage> requestedPackages, bool downloadMissing, string?  dependenciesFolderPath = null)
-#else
-        public AssemblyTree RequestPackages(IEnumerable<ManagedNuGetPackage> requestedPackages, bool downloadMissing, string  dependenciesFolderPath = null)
-#endif
         {
             var targetFramework = GetRunningFramework();
             var assemblyTree = new AssemblyTree { IsManagedByNuGetManager = true };
@@ -109,11 +95,7 @@ namespace RuntimeNuGetLoader
         /// <param name="downloadMissing">Weather or not to download missing dependencies from <a href="https://www.nuget.org">nuget.org</a></param>
         /// <returns>Instance of <see cref="AssemblyTree"/> for the requested package</returns>
         /// <exception cref="Exception">A multitude of Exceptions that can arise during resolution and loading of NuGet packages. (currently no custom exceptions have been created)</exception>
-#if LANG_V12
         public AssemblyTree RequestPackage(ManagedNuGetPackage requestedPackage, bool downloadMissing, string? dependenciesFolderPath = null)
-#else
-        public AssemblyTree RequestPackage(ManagedNuGetPackage requestedPackage, bool downloadMissing, string dependenciesFolderPath = null)
-#endif
         {
             var targetFramework = GetRunningFramework();
             if (requestedPackage.AssemblyTree != null) throw new Exception($"{requestedPackage.Id} has already been loaded.");
@@ -158,8 +140,7 @@ namespace RuntimeNuGetLoader
         /// <returns>instance of <see cref="NuGetFramework"/></returns>
         internal static NuGetFramework GetRunningFramework()
         {
-            
-#if  NETFRAMEWORK || NET
+#if  NET
             var targetFramework = NuGetFramework.Parse(AppDomain.CurrentDomain.SetupInformation.TargetFrameworkName ?? "netstandard2.0");
 #elif NETSTANDARD
             var targetFramework = NuGetFramework.Parse(AppContext.TargetFrameworkName ?? "netstandard2.0");
@@ -167,6 +148,12 @@ namespace RuntimeNuGetLoader
 #if WINDOWS
             // add windows platform to differentiate between for example net8.0 and net8.0-windows8.0
             targetFramework = new NuGetFramework(targetFramework.Framework, targetFramework.Version, "Windows", targetFramework.Version);
+#elif LINUX
+            // add linux platform to differentiate between for example net8.0 and net8.0-linux8.0
+            targetFramework = new NuGetFramework(targetFramework.Framework, targetFramework.Version, "Linux", targetFramework.Version);
+#elif UNIX // this should handle MacOS and BSD
+            // add unix platform to differentiate between for example net8.0 and net8.0-unix8.0
+            targetFramework = new NuGetFramework(targetFramework.Framework, targetFramework.Version, "Linux", targetFramework.Version);
 #endif
             return targetFramework;
         }
